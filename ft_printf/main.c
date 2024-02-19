@@ -1,25 +1,40 @@
-#include <stdio.h>
-#include <time.h>
-
-#define ORIGINAL_PRINTF printf
-
 #ifndef ORIGINAL_PRINTF
-# define F	len += ft_printf
+	#define F	len += ft_printf
 #else
-# define F	len += ORIGINAL_PRINTF
+	#define F	len += printf
 #endif
 
+#ifndef LOOP
+	#define LOOP 1
+#else
+	#if	LOOP <= 0
+		#error "LOOP cannot be negative or equal to 0"
+	#endif
+#endif
+
+#include <stdio.h> // For printf
+#include <time.h>  // For type clock_t and clock function
+
+typedef enum	e_os
+{
+	OS_LINUX,
+	OS_OTHER
+}	t_os;
+
+// PROTOTYPES
 int	ft_printf(char const *format, ...);
 
 int main(void)
 {
+	// t_os	os = OS_LINUX;
+	t_os	os = OS_OTHER;
 	clock_t start, end;
-    double cpu_time_used;
-	int	len;
+    double	cpu_time_used;
+	int		len;
 
     start = clock();
 
-	for (int i = 1; i <= 10000; ++i)
+	for (int i = 1; i <= LOOP; ++i)
 	{
 		len = 0;
 
@@ -49,32 +64,22 @@ int main(void)
 		F("%s\n", "toto");
 		F("%s\n", "wiurwuyrhwrywuier");
 
-		#ifndef ORIGINAL_PRINTF
-		F("%s\n", NULL);
-		#else
-		F("%p\n", NULL);
-		#endif
-
-		#ifndef ORIGINAL_PRINTF
-		F("-%s-%s-%s-%s-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
-		#else
-		F("-%s-%s-%s-%p-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
-		#endif
-
 		F("\n--Mixed---\n");
-		F("%d%x%d%x%d%x%d%x\n", 0, 0, 42, 42, 2147483647, 2147483647, (int)-2147483648, (int)-2147483648);
-		F("-%d-%x-%d-%x-%d-%x-%d-%x-\n", 0, 0, 42, 42, 2147483647, 2147483647, (int)-2147483648, (int)-2147483648);
-		F("\n");
+		F("%d%x%d%x%d%x%d%x\n", 0, 0, 42, 42, 2147483647, 2147483647, (int) -2147483648, (int) -2147483648);
+		F("-%d-%x-%d-%x-%d-%x-%d-%x-\n", 0, 0, 42, 42, 2147483647, 2147483647, (int) -2147483648, (int) -2147483648);
 
-		#ifndef ORIGINAL_PRINTF
-		F("%s%s%s%s\n", "", "toto", "wiurwuyrhwrywuier", NULL);
-		F("-%s-%s-%s-%s-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
-		#else
-		F("%s%s%s%p\n", "", "toto", "wiurwuyrhwrywuier", NULL);
-		F("-%s-%s-%s-%p-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
-		#endif
+		// The Linux compiler does not support NULL parameters
+		// for the %s conversion
+		if (os != OS_LINUX)
+		{
+			F("\n--Nulleables---\n");
+			F("%s\n", NULL);
+			F("-%s-%s-%s-%s-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
+			F("%s%s%s%s\n", "", "toto", "wiurwuyrhwrywuier", NULL);
+			F("-%s-%s-%s-%s-\n", "", "toto", "wiurwuyrhwrywuier", NULL);
+		}
 
-		printf("written: %d\n", len);
+		printf("written: %d\n\n\n", len);
 	}
 
 	end = clock();

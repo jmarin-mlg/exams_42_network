@@ -1,31 +1,27 @@
 #include <unistd.h> // For write
 #include <stdarg.h> // For va_list, va_start, va_arg, va_end
 
-/*
-** Exam version, perhaps not the most readable but quick to write.
-**
-** It does not comply with the Norme, it is not necessary for the exams.
-*/
-
-static void	put_string(char *string, int *length)
+static void	put_string(const char *string, int *length)
 {
-	string = (!string) ? "(null)" : string;
+	const char	*aux;
 
-	while (*string++)
-		*length += write(1, string - 1, 1);
+	if (!string)
+		aux = "(null)";
+	else
+		aux = string;
+
+	while (*aux)
+	{
+		*length += write(1, aux, 1);
+		++aux;
+	}
 }
-
-// static void	put_string(const char *string, int *length)
-// {
-// 	const char	*aux = (!string) ? "(null)" : string;
-
-// 	while (*aux++)
-// 		*length += write(1, aux - 1, 1);
-// }
 
 static void	put_digit(long long int number, int base, int *length)
 {
-	char	*hexadecimal = "0123456789abcdef";
+	char	*hexadecimal;
+
+	hexadecimal = "0123456789abcdef";
 
 	if (number < 0)
 	{
@@ -42,8 +38,9 @@ static void	put_digit(long long int number, int base, int *length)
 int	ft_printf(const char *format, ...)
 {
 	va_list	args;
-	int		length = 0;
+	int		length;
 
+	length = 0;
 	va_start(args, format);
 
 	while (*format)

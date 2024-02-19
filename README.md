@@ -12,5 +12,5 @@ versiones (rápidas de escribir y algo más extensas pero más eficientes).
 ## Exam Rank 03
 En este examen existe la posibilidad de que te toque hacer el `ft_printf` o bien
 el `get_next_line`.
-- [ft_printf](./ft_printf/)
-- [get_next_line](./get_next_line/)
+- [Ft_Printf](./ft_printf/)
+- Get_Next_Line
