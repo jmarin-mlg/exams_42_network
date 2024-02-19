@@ -1,15 +1,16 @@
-#include <unistd.h>
-#include <stdarg.h>
-
-#ifndef LINUX
-# define LINUX 0
+#ifndef	MAX_BUFFER_SIZE
+	#define MAX_BUFFER_SIZE 100
 #endif
 
-static int	ft_strlen(char *str)
-{
-	int	len = 0;
+#include <unistd.h> // For write
+#include <stdarg.h> // For va_list, va_start, va_arg, va_end
 
-	while (*str++)
+static int	ft_strlen(const char *str)
+{
+	const char	*aux = str;
+	int			len = 0;
+
+	while (*aux++)
 		++len;
 
 	return (len);
@@ -17,10 +18,13 @@ static int	ft_strlen(char *str)
 
 static int	numlen(long long int num, int base)
 {
-	int len = (num < 0) ? 1 : 0;
+	int len = 0;
 
 	if (num < 0)
+	{
+		len = 1;
 		num *= -1;
+	}
 
 	while (num != 0)
 	{
@@ -31,14 +35,11 @@ static int	numlen(long long int num, int base)
 	return (len);
 }
 
-static void	put_string(char *string, int *length)
+static void	put_string(const char *string, int *length)
 {
-	if (!string)
-		string = (LINUX == 1) ? "(nil)" : "(null)";
+	const char	*aux = (!string) ? "(null)" : string;
 
-	*length += write(1, string, ft_strlen(string));
-
-	return ;
+	*length += write(1, aux, ft_strlen(aux));
 }
 
 static void	put_digits(long long int number, int base, int *length)
@@ -50,7 +51,7 @@ static void	put_digits(long long int number, int base, int *length)
 	}
 
 	char	*hexadecimal = "0123456789abcdef";
-	char	buffer[100];
+	char	buffer[MAX_BUFFER_SIZE];
 	int		len_number = numlen(number, base);
 	int		buffer_index = len_number;
 
@@ -67,10 +68,7 @@ static void	put_digits(long long int number, int base, int *length)
 	}
 
 	buffer[buffer_index--] = hexadecimal[number % base];
-	write(1, buffer, len_number);
-	*length += len_number;
-
-	return ;
+	*length += write(1, buffer, len_number);
 }
 
 int	ft_printf(const char *format, ...)
@@ -86,11 +84,11 @@ int	ft_printf(const char *format, ...)
 		{
 			++format;
 			if (*format == 's')
-				put_string(va_arg(args, char *), &length);
+				put_string(va_arg(args, const char *), &length);
 			else if (*format == 'd')
-				put_digits((long long int)va_arg(args, int), 10, &length);
+				put_digits((long long int) va_arg(args, int), 10, &length);
 			else if (*format == 'x')
-				put_digits((long long int)va_arg(args, unsigned int), 16, &length);
+				put_digits((long long int) va_arg(args, unsigned int), 16, &length);
 		}
 		else
 			length += write(1, format, 1);
