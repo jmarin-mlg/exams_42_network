@@ -15,14 +15,6 @@ static void	put_string(char *string, int *length)
 		*length += write(1, string - 1, 1);
 }
 
-// static void	put_string(const char *string, int *length)
-// {
-// 	const char	*aux = (!string) ? "(null)" : string;
-
-// 	while (*aux++)
-// 		*length += write(1, aux - 1, 1);
-// }
-
 static void	put_digit(long long int number, int base, int *length)
 {
 	char	*hexadecimal = "0123456789abcdef";
