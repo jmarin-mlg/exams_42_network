@@ -1,5 +1,9 @@
 #ifndef	MAX_BUFFER_SIZE
-	#define MAX_BUFFER_SIZE 3
+	#define MAX_BUFFER_SIZE 55
+#else
+	#if	MAX_BUFFER_SIZE < 1 || MAX_BUFFER_SIZE > 1024
+		#error "MAX_BUFFER_SIZE must be between 1 and 1024"
+	#endif
 #endif
 
 #include <unistd.h> // For write
@@ -7,10 +11,15 @@
 
 static void	clean_buffer(char *buffer, int *len_buff)
 {
-	*len_buff = 0;
+	if (*len_buff + 1 > MAX_BUFFER_SIZE)
+	{
+		write(1, buffer, *len_buff);
 
-	for (unsigned long i = 0; i < MAX_BUFFER_SIZE; i++)
-		buffer[i] = '\0';
+		for (int i = 0; i < MAX_BUFFER_SIZE; i++)
+			buffer[i] = '\0';
+
+		*len_buff = 0;
+	}
 }
 
 static int	ft_strlen(const char *str)
@@ -21,7 +30,7 @@ static int	ft_strlen(const char *str)
 	while (*aux++)
 		++len;
 
-	return len;
+	return (len);
 }
 
 static void	put_string(const char *string, char *buffer, int *length, int *len_buff)
@@ -30,12 +39,7 @@ static void	put_string(const char *string, char *buffer, int *length, int *len_b
 
 	for (int i = 0; i < ft_strlen(aux); ++i)
 	{
-		if (*len_buff + 1 > MAX_BUFFER_SIZE)
-		{
-			write(1, buffer, *len_buff);
-			clean_buffer(buffer, len_buff);
-		}
-
+		clean_buffer(buffer, len_buff);
 		buffer[*len_buff] = aux[i];
 		(*len_buff)++;
 		(*length)++;
@@ -49,11 +53,7 @@ static void	put_digit(long long int number, int base, char *buffer, int *length,
 	if (number < 0) {
 		number *= -1;
 
-		if (*len_buff + 1 > MAX_BUFFER_SIZE) {
-			write(1, buffer, *len_buff);
-			clean_buffer(buffer, len_buff);
-		}
-
+		clean_buffer(buffer, len_buff);
 		buffer[*len_buff] = '-';
 		(*len_buff)++;
 		(*length)++;
@@ -62,12 +62,7 @@ static void	put_digit(long long int number, int base, char *buffer, int *length,
 	if (number >= base)
 		put_digit((number / base), base, buffer, length, len_buff);
 
-	if (*len_buff + 1 > MAX_BUFFER_SIZE)
-	{
-		write(1, buffer, *len_buff);
-		clean_buffer(buffer, len_buff);
-	}
-
+	clean_buffer(buffer, len_buff);
 	buffer[*len_buff] = hexadecimal[number % base];
 	(*len_buff)++;
 	(*length)++;
@@ -77,10 +72,9 @@ int	ft_printf(const char *format, ...)
 {
 	va_list	args;
 	char	buffer[MAX_BUFFER_SIZE];
-	int		len_buff;
+	int		len_buff = 0;
 	int		length = 0;
 
-	clean_buffer(buffer, &len_buff);
 	va_start(args, format);
 
 	while (*format)
@@ -101,21 +95,11 @@ int	ft_printf(const char *format, ...)
 					put_digit((long long int) va_arg(args, unsigned int), 16, buffer, &length, &len_buff);
 					break;
 				default:
-					if (len_buff + 1 > MAX_BUFFER_SIZE)
-					{
-						write(1, buffer, len_buff);
-						clean_buffer(buffer, &len_buff);
-					}
-
+					clean_buffer(buffer, &len_buff);
 					buffer[len_buff++] = '%';
 					length++;
 
-					if (len_buff + 1 > MAX_BUFFER_SIZE)
-					{
-						write(1, buffer, len_buff);
-						clean_buffer(buffer, &len_buff);
-					}
-
+					clean_buffer(buffer, &len_buff);
 					buffer[len_buff++] = *format;
 					length++;
 					break;
@@ -123,12 +107,7 @@ int	ft_printf(const char *format, ...)
 		}
 		else
 		{
-			if (len_buff + 1 > MAX_BUFFER_SIZE)
-			{
-				write(1, buffer, len_buff);
-				clean_buffer(buffer, &len_buff);
-			}
-
+			clean_buffer(buffer, &len_buff);
 			buffer[len_buff++] = *format;
 			length++;
 		}
