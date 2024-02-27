@@ -1,9 +1,0 @@
-{
-	"files.associations": {
-		"*.embeddedhtml": "html",
-		"array": "c",
-		"string_view": "c",
-		"initializer_list": "c",
-		"utility": "c"
-	}
-}

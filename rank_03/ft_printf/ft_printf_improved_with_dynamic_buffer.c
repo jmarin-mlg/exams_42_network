@@ -4,8 +4,14 @@
 
 static int	ft_strlen(const char *str)
 {
-	const char	*aux = str;
-	int			len = 0;
+	const char	*aux;
+	int			len;
+
+	if (!str)
+		return (0);
+
+	aux = str;
+	len = 0;
 
 	while (*aux++)
 		++len;
@@ -29,11 +35,14 @@ static int	numlen(long long int num, int base)
 	return (len);
 }
 
-static int	calculate_buffer_size(const char *format, va_list args)
+static int calculate_buffer_size(const char *format, va_list args)
 {
 	va_list		aux_args;
 	const char	*aux_format = format;
 	int			size = 0;
+
+	if (!format)
+		return (0);
 
 	va_copy(aux_args, args);
 
@@ -45,18 +54,18 @@ static int	calculate_buffer_size(const char *format, va_list args)
 
 			switch (*aux_format)
 			{
-				case 's':
-					size += ft_strlen(va_arg(aux_args, const char *));
-					break;
-				case 'd':
-					size += numlen((long long int) va_arg(aux_args, int), 10);
-					break;
-				case 'x':
-					size += numlen((long long int) va_arg(aux_args, unsigned int), 16);
-					break;
-				default:
-					size += 2;
-					break;
+			case 's':
+				size += ft_strlen(va_arg(aux_args, const char *));
+				break;
+			case 'd':
+				size += numlen(va_arg(aux_args, int), 10);
+				break;
+			case 'x':
+				size += numlen(va_arg(aux_args, unsigned int), 16);
+				break;
+			default:
+				size += 2;
+				break;
 			}
 		}
 		else
@@ -64,6 +73,8 @@ static int	calculate_buffer_size(const char *format, va_list args)
 
 		++aux_format;
 	}
+
+	va_end(aux_args);
 
 	return (size);
 }
@@ -98,13 +109,16 @@ int	ft_printf(const char *format, ...)
 	int		buffer_size;
 	int		length = 0;
 
+	if (!format)
+		return (-1);
+
 	va_start(args, format);
 
 	buffer_size = calculate_buffer_size(format, args);
 	buffer = (char *) malloc(buffer_size + 1);
 	if (!buffer) {
         va_end(args);
-        return -1;
+        return (-1);
     }
 
 	while (*format)
