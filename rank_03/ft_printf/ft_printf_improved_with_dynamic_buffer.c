@@ -7,8 +7,9 @@ static int	ft_strlen(const char *str)
 	const char	*aux;
 	int			len;
 
+	// If str is NULL, return 6 (length of "(null)")
 	if (!str)
-		return (0);
+		return (6);
 
 	aux = str;
 	len = 0;
@@ -58,10 +59,10 @@ static int calculate_buffer_size(const char *format, va_list args)
 				size += ft_strlen(va_arg(aux_args, const char *));
 				break;
 			case 'd':
-				size += numlen(va_arg(aux_args, int), 10);
+				size += numlen((long long int) va_arg(aux_args, int), 10);
 				break;
 			case 'x':
-				size += numlen(va_arg(aux_args, unsigned int), 16);
+				size += numlen((long long int) va_arg(aux_args, unsigned int), 16);
 				break;
 			default:
 				size += 2;
